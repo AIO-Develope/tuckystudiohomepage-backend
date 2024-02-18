@@ -1,23 +1,23 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
 const usersFilePath = path.join(__dirname, '../data/users.json');
 
 const User = {
-  getAllUsers: () => {
+  getAllUsers: async () => {
     try {
-      const usersData = fs.readFileSync(usersFilePath);
+      const usersData = await fs.readFile(usersFilePath, 'utf8');
       return JSON.parse(usersData);
     } catch (error) {
       return [];
     }
   },
 
-  addUser: (user) => {
+  addUser: async (user) => {
     try {
-      const usersData = User.getAllUsers();
+      const usersData = await User.getAllUsers();
       usersData.push(user);
-      fs.writeFileSync(usersFilePath, JSON.stringify(usersData));
+      await fs.writeFile(usersFilePath, JSON.stringify(usersData));
       return true;
     } catch (error) {
       console.error('Error adding user:', error);
@@ -25,9 +25,14 @@ const User = {
     }
   },
 
-  getUserByUsername: (username) => {
-    const usersData = User.getAllUsers();
-    return usersData.find(user => user.username === username);
+  getUserByUsername: async (username) => {
+    try {
+      const usersData = await User.getAllUsers();
+      return usersData.find(user => user.username === username);
+    } catch (error) {
+      console.error('Error getting user by username:', error);
+      return null;
+    }
   }
 };
 

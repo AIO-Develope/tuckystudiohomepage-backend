@@ -1,4 +1,6 @@
 const express = require('express');
+const cors = require('cors'); // Import cors middleware
+
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
@@ -9,11 +11,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cors());
 
 // Routes
 app.use('/auth', authRoutes);
 
-// Ensure the data directory exists
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir);
