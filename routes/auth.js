@@ -22,7 +22,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
-    res.json({ userId: user.id, token });
+    res.json({ userId: user.id, token, tempPass: user.tempPass });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -62,7 +62,6 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
 router.patch('/edit', verifyToken, async (req, res) => {
   try {
     const userIdToUpdate = req.userId;
-    console.log(userIdToUpdate)
     const userDataToUpdate = req.body;
 
     if (!Object.keys(userDataToUpdate).length) {
