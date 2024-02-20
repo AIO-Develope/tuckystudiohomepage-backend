@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin')
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cors());
 
 // Routes
 app.use('/auth', authRoutes);
+app.use('/admin', adminRoutes)
 
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
