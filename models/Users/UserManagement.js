@@ -21,12 +21,13 @@ const UserManagement = {
     }
   },
 
-  addTempUser: async () => {
+  addTempUser: async (user) => {
     try {
       const usersData = await UserFetch.getAllUsers();
       const generatedPassword = generateRandomPassword();
       const hashedPassword = await bcrypt.hash(generatedPassword, 10);
       const newUser = {
+        username: user.username,
         id: uuidv4(),
         password: hashedPassword,
         admin: false,

@@ -42,7 +42,7 @@ router.post('/user/tempregister', verifyToken, isAdmin, async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: 'Username already exists' });
     }
-    const newUser = { username};
+    const newUser = { username };
     const password = await UserManagement.addTempUser(newUser);
     res.status(201).json({ message: 'Temp User registered successfully', TempPassword: password });
   } catch (error) {
