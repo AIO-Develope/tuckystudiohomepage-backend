@@ -5,7 +5,7 @@ const UserFetch = require('../models/Users/UserFetch');
 
 const verifyToken = require('../middlewares/verify');
 
-
+const UserManagement = require('../models/Users/UserManagement')
 const router = express.Router();
 
 
@@ -50,11 +50,47 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
       id: user.id,
       username: user.username,
       isAdmin: user.admin,
+      tempUser: user.tempPass,
     };
     res.json(userInfo);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+router.patch('/edit', verifyToken, async (req, res) => {
+  try {
+    const userIdToUpdate = req.userId;
+    console.log(userIdToUpdate)
+    const userDataToUpdate = req.body;
+
+    if (!Object.keys(userDataToUpdate).length) {
+      return res.status(400).json({ message: 'At least one field to update is required' });
+    }
+
+    const userToUpdate = await UserFetch.getUserById(userIdToUpdate);
+    if (!userToUpdate) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const filteredUserData = {};
+    for (const key in userDataToUpdate) {
+      if (userDataToUpdate[key] !== undefined) {
+        filteredUserData[key] = userDataToUpdate[key];
+      }
+    }
+
+    const updateResult = await UserManagement.editUser(userIdToUpdate, filteredUserData);
+    if (updateResult === true) {
+      return res.json({ message: 'User information updated successfully' });
+    } else {
+      return res.status(400).json({ message: updateResult.message });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 module.exports = router;
