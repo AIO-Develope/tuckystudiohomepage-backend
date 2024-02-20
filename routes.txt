@@ -1,0 +1,64 @@
+[
+  {
+    "path": "/auth/login",
+    "methods": [
+      "POST"
+    ],
+    "middlewares": [
+      "anonymous"
+    ]
+  },
+  {
+    "path": "/auth/verify",
+    "methods": [
+      "GET"
+    ],
+    "middlewares": [
+      "verifyToken",
+      "anonymous"
+    ]
+  },
+  {
+    "path": "/auth/getUserInformationsAuth",
+    "methods": [
+      "GET"
+    ],
+    "middlewares": [
+      "verifyToken",
+      "anonymous"
+    ]
+  },
+  {
+    "path": "/admin/user/register",
+    "methods": [
+      "POST"
+    ],
+    "middlewares": [
+      "verifyToken",
+      "isAdmin",
+      "anonymous"
+    ]
+  },
+  {
+    "path": "/admin/user/delete/:id",
+    "methods": [
+      "DELETE"
+    ],
+    "middlewares": [
+      "verifyToken",
+      "isAdmin",
+      "anonymous"
+    ]
+  },
+  {
+    "path": "/admin/user/edit/:id",
+    "methods": [
+      "PATCH"
+    ],
+    "middlewares": [
+      "verifyToken",
+      "isAdmin",
+      "anonymous"
+    ]
+  }
+]
