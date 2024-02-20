@@ -9,20 +9,46 @@ const isAdmin = require('../middlewares/isAdmin');
 const router = express.Router();
 
 router.post('/user/register', verifyToken, isAdmin, async (req, res) => {
-    try {
-      const { username, password } = req.body;
-      const existingUser = await UserFetch.getUserByUsername(username);
-      if (existingUser) {
-        return res.status(400).json({ message: 'Username already exists' });
-      }
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = { username, password: hashedPassword };
-      await UserManagement.addUser(newUser);
-      res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  try {
+    const { username, password } = req.body;
+    if (!username) {
+      return res.status(400).json({ message: 'Username is required' });
     }
-  });
+
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required' });
+    }
+
+    const existingUser = await UserFetch.getUserByUsername(username);
+    if (existingUser) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = { username, password: hashedPassword };
+    await UserManagement.addUser(newUser);
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/user/tempregister', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { username } = req.body;
+    if (!username) {
+      return res.status(400).json({ message: 'Username is required' });
+    }
+    const existingUser = await UserFetch.getUserByUsername(username);
+    if (existingUser) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+    const newUser = { username};
+    const password = await UserManagement.addTempUser(newUser);
+    res.status(201).json({ message: 'Temp User registered successfully', TempPassword: password });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.delete('/user/delete/:id', verifyToken, isAdmin, async (req, res) => {
   try {
