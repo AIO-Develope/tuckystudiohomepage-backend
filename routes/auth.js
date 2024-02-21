@@ -62,7 +62,6 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
 router.patch('/edit', verifyToken, async (req, res) => {
   try {
     const userIdToUpdate = req.userId;
-    console.log(userIdToUpdate)
     const userDataToUpdate = req.body;
 
     if (!Object.keys(userDataToUpdate).length) {
