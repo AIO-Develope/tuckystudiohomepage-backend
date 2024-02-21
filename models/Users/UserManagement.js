@@ -59,6 +59,7 @@ const UserManagement = {
 
   editUser: async (userId, newData) => {
     try {
+      let tempPass
       const usersData = await UserFetch.getAllUsers();
       const index = usersData.findIndex(user => user.id === userId);
       if (index !== -1) {
@@ -73,10 +74,15 @@ const UserManagement = {
         if (newData.password) {
           const hashedPassword = await bcrypt.hash(newData.password, 10);
           userToUpdate.password = hashedPassword;
+          tempPass = false
         }
         if (newData.hasOwnProperty('admin')) {
           userToUpdate.admin = newData.admin;
         }
+
+
+        userToUpdate.tempPass = tempPass;
+
         const usersFilePath = await getData.getUsersFilePath();
         await fs.writeFile(usersFilePath, JSON.stringify(usersData));
         return true;
