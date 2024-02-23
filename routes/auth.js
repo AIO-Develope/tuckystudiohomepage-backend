@@ -9,6 +9,23 @@ const UserManagement = require('../models/Users/UserManagement')
 const router = express.Router();
 
 
+const multer = require('multer');
+const path = require('path');
+
+
+// Multer storage configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+
+const upload = multer({ storage: storage });
+
 
 router.post('/login', async (req, res) => {
   try {
@@ -46,9 +63,15 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const imageLink = user.profilePicture ? `${req.protocol}://${req.get('host')}/${user.profilePicture}` : null;
+
     const userInfo = {
       id: user.id,
       username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profilePicture: imageLink,
       isAdmin: user.admin,
       tempUser: user.tempPass,
     };
@@ -59,7 +82,12 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
 });
 
 
-router.patch('/edit', verifyToken, async (req, res) => {
+
+
+
+
+
+router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, res) => {
   try {
     const userIdToUpdate = req.userId;
     const userDataToUpdate = req.body;
@@ -80,6 +108,10 @@ router.patch('/edit', verifyToken, async (req, res) => {
       }
     }
 
+    if (req.file) {
+      filteredUserData.profilePicture = req.file.path;
+    }
+
     const updateResult = await UserManagement.editUser(userIdToUpdate, filteredUserData);
     if (updateResult === true) {
       return res.json({ message: 'User information updated successfully' });
@@ -90,6 +122,7 @@ router.patch('/edit', verifyToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 
 module.exports = router;

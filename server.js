@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/auth', authRoutes);
