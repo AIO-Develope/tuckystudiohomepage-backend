@@ -91,6 +91,39 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
 
 
 
+router.get('/staff', verifyToken, async (req, res) => {
+  try {
+    // Check if the user is an admin, if not, return 403 Forbidden
+    const user = await UserFetch.getUserById(req.userId);
+    
+
+    // Get all users
+    const allUsers = await UserFetch.getAllUsers();
+
+    // Construct response array
+    // Construct response array
+const usersData = allUsers.map(user => {
+  let imageLink = null;
+  if (user.profilePicture) {
+    imageLink = `${req.protocol}://${req.get('host')}/${user.profilePicture}`;
+  } else {
+    // If profile picture is null, use default URL
+    imageLink = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1024px-Default_pfp.svg.png';
+  }
+  return {
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    profilePicture: imageLink
+  };
+});
+
+    res.json(usersData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 
 
