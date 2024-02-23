@@ -63,7 +63,10 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const imageLink = user.profilePicture ? `${req.protocol}://${req.get('host')}/${user.profilePicture}` : null;
+    let imageLink = null; // Initialize imageLink as null
+    if (user.profilePicture) {
+      imageLink = `${req.protocol}://${req.get('host')}/${user.profilePicture}`;
+    }
 
     const userInfo = {
       id: user.id,
@@ -71,10 +74,15 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      profilePicture: imageLink,
       isAdmin: user.admin,
-      tempUser: user.tempPass,
+      tempUser: user.tempPass
     };
+
+    // Add profilePicture to userInfo only if it exists
+    if (imageLink !== null) {
+      userInfo.profilePicture = imageLink;
+    }
+
     res.json(userInfo);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -110,7 +118,10 @@ router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, r
       filteredUserData.profilePicture = req.file.path;
       
     }
-    
+    if (filteredUserData.password) {
+
+      filteredUserData.tempPass = false;
+    }
 
     if (Object.keys(filteredUserData).length === 0) {
       return res.status(400).json({ message: 'At least one field to update is required' });
