@@ -90,16 +90,13 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
 router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, res) => {
   try {
     const userIdToUpdate = req.userId;
-    const userDataToUpdate = req.body;
-
-    if (!Object.keys(userDataToUpdate).length) {
-      return res.status(400).json({ message: 'At least one field to update is required' });
-    }
 
     const userToUpdate = await UserFetch.getUserById(userIdToUpdate);
     if (!userToUpdate) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    const userDataToUpdate = req.body;
 
     const filteredUserData = {};
     for (const key in userDataToUpdate) {
@@ -109,7 +106,14 @@ router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, r
     }
 
     if (req.file) {
+      
       filteredUserData.profilePicture = req.file.path;
+      
+    }
+    
+
+    if (Object.keys(filteredUserData).length === 0) {
+      return res.status(400).json({ message: 'At least one field to update is required' });
     }
 
     const updateResult = await UserManagement.editUser(userIdToUpdate, filteredUserData);
@@ -122,6 +126,8 @@ router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, r
     res.status(500).json({ error: error.message });
   }
 });
+
+
 
 
 
