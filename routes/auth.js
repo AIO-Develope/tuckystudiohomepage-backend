@@ -13,7 +13,6 @@ const multer = require('multer');
 const path = require('path');
 
 
-// Multer storage configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -63,7 +62,7 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    let imageLink = null; // Initialize imageLink as null
+    let imageLink = null;
     if (user.profilePicture) {
       imageLink = `${req.protocol}://${req.get('host')}/${user.profilePicture}`;
     }
@@ -78,7 +77,6 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
       tempUser: user.tempPass
     };
 
-    // Add profilePicture to userInfo only if it exists
     if (imageLink !== null) {
       userInfo.profilePicture = imageLink;
     }
@@ -93,21 +91,17 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
 
 router.get('/staff', verifyToken, async (req, res) => {
   try {
-    // Check if the user is an admin, if not, return 403 Forbidden
     const user = await UserFetch.getUserById(req.userId);
     
 
-    // Get all users
     const allUsers = await UserFetch.getAllUsers();
 
-    // Construct response array
-    // Construct response array
+
 const usersData = allUsers.map(user => {
   let imageLink = null;
   if (user.profilePicture) {
     imageLink = `${req.protocol}://${req.get('host')}/${user.profilePicture}`;
   } else {
-    // If profile picture is null, use default URL
     imageLink = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1024px-Default_pfp.svg.png';
   }
   return {
@@ -148,7 +142,6 @@ router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, r
     }
 
     if (req.file) {
-      // Delete the old profile picture if it exists
       if (userToUpdate.profilePicture) {
         const fs = require('fs');
         const path = require('path');

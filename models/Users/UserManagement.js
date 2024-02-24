@@ -11,10 +11,10 @@ const UserManagement = {
       user.id = uuidv4();
       user.admin = false;
       user.tempPass = false;
-      user.firstName = ''; // Add empty first name
-      user.lastName = ''; // Add empty last name
-      user.email = ''; // Add empty email
-      user.profilePicture = ''; // Add empty profile picture path
+      user.firstName = '';
+      user.lastName = '';
+      user.email = '';
+      user.profilePicture = '';
       usersData.push(user);
       const usersFilePath = await getData.getUsersFilePath();
       await fs.writeFile(usersFilePath, JSON.stringify(usersData));
@@ -36,10 +36,10 @@ const UserManagement = {
         password: hashedPassword,
         admin: false,
         tempPass: true,
-        firstName: '', // Add empty first name
-        lastName: '', // Add empty last name
-        email: '', // Add empty email
-        profilePicture: '' // Add empty profile picture path
+        firstName: '',
+        lastName: '',
+        email: '',
+        profilePicture: ''
       };
       usersData.push(newUser);
       const usersFilePath = await getData.getUsersFilePath();
@@ -55,9 +55,24 @@ const UserManagement = {
   removeUser: async (userId) => {
     try {
       const usersData = await UserFetch.getAllUsers();
+  
+      const userToRemove = usersData.find(user => user.id === userId);
+  
+      if (!userToRemove) {
+        console.error('User not found');
+        return false;
+      }
+  
+      const profilePicturePath = userToRemove.profilePicture;
+  
+      await fs.unlink(profilePicturePath);
+  
       const filteredUsers = usersData.filter(user => user.id !== userId);
+  
       const usersFilePath = await getData.getUsersFilePath();
+  
       await fs.writeFile(usersFilePath, JSON.stringify(filteredUsers));
+  
       return true;
     } catch (error) {
       console.error('Error removing user:', error);
