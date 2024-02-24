@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/admin')
+const adminRoutes = require('./routes/admin');
 
 dotenv.config();
 
@@ -18,12 +18,19 @@ app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/auth', authRoutes);
-app.use('/admin', adminRoutes)
+app.use('/admin', adminRoutes);
 
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir);
+const uploadsDir = path.join(__dirname, 'uploads');
+const tempDir = path.join(uploadsDir, 'temp');
+
+// Create 'uploads' folder if it doesn't exist
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
 }
 
+// Create 'temp' folder inside 'uploads' folder if it doesn't exist
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir);
+}
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

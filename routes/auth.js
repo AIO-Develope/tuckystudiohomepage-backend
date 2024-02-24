@@ -147,12 +147,17 @@ router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, r
     }
 
     if (req.file) {
-      
-      filteredUserData.profilePicture = req.file.path;
-      
-    }
-    if (filteredUserData.password) {
+      // Delete the old profile picture if it exists
+      if (userToUpdate.profilePicture) {
+        const fs = require('fs');
+        const path = require('path');
+        fs.unlinkSync(path.join(__dirname, '..', userToUpdate.profilePicture));
+      }
 
+      filteredUserData.profilePicture = req.file.path;
+    }
+
+    if (filteredUserData.password) {
       filteredUserData.tempPass = false;
     }
 
@@ -170,6 +175,7 @@ router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, r
     res.status(500).json({ error: error.message });
   }
 });
+
 
 
 
