@@ -14,6 +14,7 @@ const UserManagement = {
       user.firstName = '';
       user.lastName = '';
       user.email = '';
+      user.roles = []; 
       user.profilePicture = '';
       usersData.push(user);
       const usersFilePath = await getData.getUsersFilePath();
@@ -39,7 +40,9 @@ const UserManagement = {
         firstName: '',
         lastName: '',
         email: '',
-        profilePicture: ''
+        profilePicture: '',
+        roles: []
+
       };
       usersData.push(newUser);
       const usersFilePath = await getData.getUsersFilePath();
@@ -100,6 +103,10 @@ const UserManagement = {
           const hashedPassword = await bcrypt.hash(newData.password, 10);
           userToUpdate.password = hashedPassword;
           tempPass = false;
+        }
+
+        if (newData.hasOwnProperty('roles')) {
+          userToUpdate.roles = newData.roles;
         }
   
         if (newData.hasOwnProperty('admin')) {
