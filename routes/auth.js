@@ -138,6 +138,20 @@ router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, r
     const filteredUserData = {};
     for (const key in userDataToUpdate) {
       if (userDataToUpdate[key] !== undefined) {
+        if (key === 'admin') {
+          return res.status(403).json({ message: 'You do not have permission to change admin status' });
+        }
+        if (key === 'id') {
+          return res.status(403).json({ message: 'You do not have permission to change id' });
+        }
+        if (key === 'profilePicture') {
+          return res.status(403).json({ message: 'You do not have permission to change that' });
+        }
+        if (key === 'roles') {
+          return res.status(403).json({ message: 'You do not have permission to change roles' });
+        }
+        
+        
         filteredUserData[key] = userDataToUpdate[key];
       }
     }
@@ -155,6 +169,8 @@ router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, r
     if (filteredUserData.password) {
       filteredUserData.tempPass = false;
     }
+
+    
 
     if (Object.keys(filteredUserData).length === 0) {
       return res.status(400).json({ message: 'At least one field to update is required' });
