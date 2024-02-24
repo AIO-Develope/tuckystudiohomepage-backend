@@ -9,6 +9,22 @@ const UserManagement = require('../models/Users/UserManagement')
 const router = express.Router();
 
 
+const multer = require('multer');
+const path = require('path');
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+
+const upload = multer({ storage: storage });
+
 
 router.post('/login', async (req, res) => {
   try {
@@ -46,12 +62,25 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    let imageLink = null;
+    if (user.profilePicture) {
+      imageLink = `${req.protocol}://${req.get('host')}/${user.profilePicture}`;
+    }
+
     const userInfo = {
       id: user.id,
       username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
       isAdmin: user.admin,
-      tempUser: user.tempPass,
+      tempUser: user.tempPass
     };
+
+    if (imageLink !== null) {
+      userInfo.profilePicture = imageLink;
+    }
+
     res.json(userInfo);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -59,25 +88,75 @@ router.get('/getUserInformationsAuth', verifyToken, async (req, res) => {
 });
 
 
-router.patch('/edit', verifyToken, async (req, res) => {
+
+router.get('/staff', verifyToken, async (req, res) => {
+  try {
+    const user = await UserFetch.getUserById(req.userId);
+    
+
+    const allUsers = await UserFetch.getAllUsers();
+
+
+const usersData = allUsers.map(user => {
+  let imageLink = null;
+  if (user.profilePicture) {
+    imageLink = `${req.protocol}://${req.get('host')}/${user.profilePicture}`;
+  } else {
+    imageLink = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1024px-Default_pfp.svg.png';
+  }
+  return {
+    uuid: user.id,
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    profilePicture: imageLink
+  };
+});
+
+    res.json(usersData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
+router.post('/edit', verifyToken, upload.single('profilePicture'), async (req, res) => {
   try {
     const userIdToUpdate = req.userId;
-    const userDataToUpdate = req.body;
-
-    if (!Object.keys(userDataToUpdate).length) {
-      return res.status(400).json({ message: 'At least one field to update is required' });
-    }
 
     const userToUpdate = await UserFetch.getUserById(userIdToUpdate);
     if (!userToUpdate) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const userDataToUpdate = req.body;
+
     const filteredUserData = {};
     for (const key in userDataToUpdate) {
       if (userDataToUpdate[key] !== undefined) {
         filteredUserData[key] = userDataToUpdate[key];
       }
+    }
+
+    if (req.file) {
+      if (userToUpdate.profilePicture) {
+        const fs = require('fs');
+        const path = require('path');
+        fs.unlinkSync(path.join(__dirname, '..', userToUpdate.profilePicture));
+      }
+
+      filteredUserData.profilePicture = req.file.path;
+    }
+
+    if (filteredUserData.password) {
+      filteredUserData.tempPass = false;
+    }
+
+    if (Object.keys(filteredUserData).length === 0) {
+      return res.status(400).json({ message: 'At least one field to update is required' });
     }
 
     const updateResult = await UserManagement.editUser(userIdToUpdate, filteredUserData);
@@ -90,6 +169,10 @@ router.patch('/edit', verifyToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+
+
 
 
 module.exports = router;
