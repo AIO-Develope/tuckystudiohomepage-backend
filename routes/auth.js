@@ -111,6 +111,7 @@ const usersData = allUsers.map(user => {
     imageLink = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1024px-Default_pfp.svg.png';
   }
   return {
+    uuid: user.id,
     username: user.username,
     firstName: user.firstName,
     lastName: user.lastName,
