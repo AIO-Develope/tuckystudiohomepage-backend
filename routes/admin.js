@@ -124,7 +124,6 @@ router.post('/role/add', verifyToken, isAdmin, async (req, res) => {
 router.get('/roles', verifyToken, isAdmin, async (req, res) => {
   
     const allRoles = await RolesFetch.getAllRoles();
-    console.log(allRoles)
     res.status(201).json({ allRoles });
 });
 
