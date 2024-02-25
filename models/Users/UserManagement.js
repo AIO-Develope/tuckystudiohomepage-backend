@@ -70,9 +70,7 @@ const UserManagement = {
 
       if (profilePicturePath && profilePicturePath !== '') {
         await fs.unlink(profilePicturePath);
-      } else {
-        console.log('Profile picture not found for the user');
-      }
+      } 
       const filteredUsers = usersData.filter(user => user.id !== userId);
 
       const usersFilePath = await getData.getUsersFilePath();
