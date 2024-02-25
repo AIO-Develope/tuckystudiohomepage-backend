@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const UserFetch = require('./UserFetch');
 const getData = require('./getData');
 const bcrypt = require('bcrypt')
-
+const RolesFetch = require('../Team/RolesFetch')
 const UserManagement = {
   addUser: async (user) => {
     try {
@@ -106,7 +106,17 @@ const UserManagement = {
         }
 
         if (newData.hasOwnProperty('roles')) {
-          userToUpdate.roles = newData.roles;
+          // Fetch all roles
+          const allRoles = await RolesFetch.getAllRoles();
+  
+          // Map role IDs to their objects for easier lookup
+          const roleMap = allRoles.reduce((map, role) => {
+            map[role.id] = role;
+            return map;
+          }, {});
+  
+          // Add role objects to user's roles array
+          userToUpdate.roles = newData.roles.map(roleId => roleMap[roleId]);
         }
   
         if (newData.hasOwnProperty('admin')) {

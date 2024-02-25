@@ -2,10 +2,10 @@ const express = require('express');
 const UserManagement = require('../models/Users/UserManagement');
 const UserFetch = require('../models/Users/UserFetch');
 const bcrypt = require('bcrypt')
-
+const RolesFetch = require('../models/Team/RolesFetch')
 const verifyToken = require('../middlewares/verify');
 const isAdmin = require('../middlewares/isAdmin');
-
+const RoleManagement = require('../models/Team/RoleManagement')
 const router = express.Router();
 
 router.post('/user/register', verifyToken, isAdmin, async (req, res) => {
@@ -97,5 +97,35 @@ router.patch('/user/edit/:id', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
+
+router.post('/role/add', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { roleName } = req.body;
+
+    if (!roleName) {
+      return res.status(400).json({ message: 'Role name is required' });
+    }
+
+    const existingRole = await RolesFetch.getRoleByName(roleName);
+    if (existingRole) {
+      return res.status(400).json({ message: 'Role already exists' });
+    }
+
+    const newRole = { roleName };
+    await RoleManagement.addRole(newRole);
+
+    res.status(201).json({ message: 'Role added successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+router.get('/roles', verifyToken, isAdmin, async (req, res) => {
+  
+    const allRoles = await RolesFetch.getAllRoles();
+    console.log(allRoles)
+    res.status(201).json({ allRoles });
+});
 
 module.exports = router;
