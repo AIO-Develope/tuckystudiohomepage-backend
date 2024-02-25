@@ -14,7 +14,7 @@ const UserManagement = {
       user.firstName = '';
       user.lastName = '';
       user.email = '';
-      user.roles = []; 
+      user.roles = [];
       user.profilePicture = '';
       usersData.push(user);
       const usersFilePath = await getData.getUsersFilePath();
@@ -58,24 +58,27 @@ const UserManagement = {
   removeUser: async (userId) => {
     try {
       const usersData = await UserFetch.getAllUsers();
-  
+
       const userToRemove = usersData.find(user => user.id === userId);
-  
+
       if (!userToRemove) {
         console.error('User not found');
         return false;
       }
-  
+
       const profilePicturePath = userToRemove.profilePicture;
-  
-      await fs.unlink(profilePicturePath);
-  
+
+      if (profilePicturePath && profilePicturePath !== '') {
+        await fs.unlink(profilePicturePath);
+      } else {
+        console.log('Profile picture not found for the user');
+      }
       const filteredUsers = usersData.filter(user => user.id !== userId);
-  
+
       const usersFilePath = await getData.getUsersFilePath();
-  
+
       await fs.writeFile(usersFilePath, JSON.stringify(filteredUsers));
-  
+
       return true;
     } catch (error) {
       console.error('Error removing user:', error);
@@ -90,7 +93,7 @@ const UserManagement = {
       if (index !== -1) {
         const userToUpdate = usersData[index];
         let tempPass;
-  
+
         if (newData.username && newData.username !== userToUpdate.username) {
           const usernameExists = usersData.some(user => user.username === newData.username);
           if (usernameExists) {
@@ -98,7 +101,7 @@ const UserManagement = {
           }
           userToUpdate.username = newData.username;
         }
-        
+
         if (newData.password) {
           const hashedPassword = await bcrypt.hash(newData.password, 10);
           userToUpdate.password = hashedPassword;
@@ -107,40 +110,40 @@ const UserManagement = {
 
         if (newData.hasOwnProperty('roles')) {
           const allRoles = await RolesFetch.getAllRoles();
-  
+
           const roleMap = allRoles.reduce((map, role) => {
             map[role.id] = role;
             return map;
           }, {});
-  
+
           userToUpdate.roles = newData.roles.map(roleId => roleMap[roleId]);
         }
-  
+
         if (newData.hasOwnProperty('admin')) {
           userToUpdate.admin = newData.admin;
         }
-  
+
         if (newData.hasOwnProperty('firstName')) {
           userToUpdate.firstName = newData.firstName;
         }
-  
+
         if (newData.hasOwnProperty('lastName')) {
           userToUpdate.lastName = newData.lastName;
         }
-  
+
         if (newData.hasOwnProperty('email')) {
           userToUpdate.email = newData.email;
         }
-  
+
         if (newData.hasOwnProperty('profilePicture')) {
           userToUpdate.profilePicture = newData.profilePicture;
         }
-  
+
         if (newData.hasOwnProperty('tempPass')) {
           userToUpdate.tempPass = newData.tempPass;
           tempPass = newData.tempPass;
         }
-  
+
         const usersFilePath = await getData.getUsersFilePath();
         await fs.writeFile(usersFilePath, JSON.stringify(usersData));
         return true;
@@ -152,15 +155,15 @@ const UserManagement = {
       return false;
     }
   }
-  
-  
+
+
 };
 function generateRandomPassword() {
   const length = 10;
   const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let retVal = "";
   for (let i = 0; i < length; ++i) {
-      retVal += charset.charAt(Math.floor(Math.random() * charset.length));
+    retVal += charset.charAt(Math.floor(Math.random() * charset.length));
   }
   return retVal;
 }
