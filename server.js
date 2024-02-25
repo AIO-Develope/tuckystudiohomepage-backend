@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
 
-//test
 
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
@@ -18,19 +17,16 @@ app.use(express.json());
 app.use(cors());
 app.use('/uploads', express.static('uploads'));
 
-// Routes
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 
 const uploadsDir = path.join(__dirname, 'uploads');
 const tempDir = path.join(uploadsDir, 'temp');
 
-// Create 'uploads' folder if it doesn't exist
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
-// Create 'temp' folder inside 'uploads' folder if it doesn't exist
 if (!fs.existsSync(tempDir)) {
   fs.mkdirSync(tempDir);
 }
