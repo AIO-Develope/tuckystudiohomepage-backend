@@ -13,7 +13,7 @@ const RolesFetch = {
 
   getAllRoles: async () => {
     try {
-      const rolesData = await getData.getRolesData(); // Assuming you have a method to get roles data
+      const rolesData = await getData.getRolesData();
       return rolesData;
     } catch (error) {
       console.error('Error getting all roles:', error);

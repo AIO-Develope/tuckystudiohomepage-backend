@@ -45,7 +45,6 @@ const RolesManagement = {
       const roleToUpdateIndex = rolesData.findIndex(role => role.id === roleId);
       if (roleToUpdateIndex !== -1) {
         const roleToUpdate = rolesData[roleToUpdateIndex];
-        // Update fields if they exist in newData
         for (const key in newData) {
           if (newData.hasOwnProperty(key)) {
             roleToUpdate[key] = newData[key];

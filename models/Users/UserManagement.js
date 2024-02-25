@@ -106,16 +106,13 @@ const UserManagement = {
         }
 
         if (newData.hasOwnProperty('roles')) {
-          // Fetch all roles
           const allRoles = await RolesFetch.getAllRoles();
   
-          // Map role IDs to their objects for easier lookup
           const roleMap = allRoles.reduce((map, role) => {
             map[role.id] = role;
             return map;
           }, {});
   
-          // Add role objects to user's roles array
           userToUpdate.roles = newData.roles.map(roleId => roleMap[roleId]);
         }
   
