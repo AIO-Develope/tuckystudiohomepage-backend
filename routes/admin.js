@@ -119,6 +119,30 @@ router.post('/role/add', verifyToken, isAdmin, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+router.post('/role/remove', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { roleId } = req.body;
+
+    if (!roleId) {
+      return res.status(400).json({ message: 'Role ID is required' });
+    }
+
+    const existingRole = await RolesFetch.getRoleById(roleId);
+    if (!existingRole) {
+      return res.status(400).json({ message: 'Role does not exist' });
+    }
+
+    const success = await RoleManagement.removeRole(roleId); // Passing roleId directly
+    if (success) {
+      return res.status(201).json({ message: 'Role removed successfully' });
+    } else {
+      return res.status(500).json({ message: 'Failed to remove role' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 
 router.get('/roles', verifyToken, isAdmin, async (req, res) => {

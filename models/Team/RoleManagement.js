@@ -2,6 +2,8 @@ const fs = require('fs').promises;
 const { v4: uuidv4 } = require('uuid');
 const RolesFetch = require('./RolesFetch');
 const getData = require('../Users/getData');
+const UserFetch = require('../Users/UserFetch')
+const UserManagement = require('../Users/UserManagement')
 
 const RolesManagement = {
   addRole: async (role) => {
@@ -29,6 +31,14 @@ const RolesManagement = {
         console.error('Role not found');
         return false;
       }
+      const roleName = rolesData[roleToRemoveIndex].roleName;
+  
+      const usersWithRole = await UserFetch.getUsersByRole(roleName);
+      for (const user of usersWithRole) {
+        const updatedRoles = user.roles.filter(role => role.id !== roleId);
+        await UserManagement.editUser(user.id, { roles: updatedRoles });
+      }
+  
       rolesData.splice(roleToRemoveIndex, 1);
       const rolesFilePath = await getData.getRolesFilePath();
       await fs.writeFile(rolesFilePath, JSON.stringify(rolesData));
@@ -38,6 +48,7 @@ const RolesManagement = {
       return false;
     }
   },
+  
 
   editRole: async (roleId, newData) => {
     try {

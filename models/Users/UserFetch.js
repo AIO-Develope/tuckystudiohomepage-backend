@@ -10,6 +10,18 @@ const UserFetch = {
       return null;
     }
   },
+  getUsersByRole: async (roleName) => {
+    try {
+      const usersData = await UserFetch.getAllUsers();
+      const usersWithRole = usersData.filter(user => {
+        return user.roles.some(role => role.roleName === roleName);
+      });
+      return usersWithRole;
+    } catch (error) {
+      console.error('Error getting users by role:', error);
+      return [];
+    }
+  },
 
   getUserById: async (userId) => {
     try {

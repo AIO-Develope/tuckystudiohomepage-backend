@@ -10,6 +10,15 @@ const RolesFetch = {
       return null;
     }
   },
+  getRoleById: async (id) => {
+    try {
+      const rolesData = await RolesFetch.getAllRoles();
+      return rolesData.find(role => role.id === id);
+    } catch (error) {
+      console.error('Error getting role by name:', error);
+      return null;
+    }
+  },
 
   getAllRoles: async () => {
     try {
