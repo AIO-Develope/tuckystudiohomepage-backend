@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
 
+//test
+
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 
