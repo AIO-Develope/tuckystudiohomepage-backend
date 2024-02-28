@@ -11,7 +11,7 @@ const adminRoutes = require('./routes/admin');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 2087;
 
 app.use(express.json());
 app.use(cors());
