@@ -7,7 +7,7 @@ const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
-
+const userRoutes = require('./routes/user')
 dotenv.config();
 
 const app = express();
@@ -19,6 +19,7 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/user', userRoutes)
 
 const uploadsDir = path.join(__dirname, 'uploads');
 const tempDir = path.join(uploadsDir, 'temp');
